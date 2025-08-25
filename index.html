@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://glitch.com/favicon.ico" />
+    <title>Widget Flow</title>
+    <script
+      type="text/javascript"
+      src="https://assets.test-one-pingone.com/davinci/latest/davinci.js"
+    ></script>
+
+    <script>
+      function loadwidget(flowParameters) {
+        const flowURL = "https://auth.test-one-pingone.com";
+        const tokenURL = "https://orchestrate-api.test-one-pingone.com";
+        const companyId = "7cbf1eb1-28a8-4310-b017-b9bc9ef15cdb";
+        const skApiKey =
+          "eabe5f4248812e4ecc2ce557b0e9c6ffd75d0da943f45bd1314c52fdfe9e51972de01a89377d304b0801aa45f27c7ea05ab62b87988ecd6e7f1b0e7b10f376fb52ccee934c154d4b6b59f77785558c77ef4ca7f478398bd1c0da66a6fe89aaa012ca03affa3b2aa6509bfe51f1b5f0cb9f2795a388217869ea99c38870eac432";
+        const policyId = "b63bb94857c5a9e9074a253dc75133be";
+
+        const skGetTokenUrl =
+          tokenURL + "/v1/company/" + companyId + "/sdktoken";
+
+        var headers = new Headers();
+        headers.append("X-SK-API-KEY", skApiKey);
+        var requestOptions = {
+          method: "GET",
+          headers: headers,
+          redirect: "follow",
+        };
+
+        fetch(skGetTokenUrl, requestOptions)
+          .then((response) => response.json())
+          .then((responseData) => {
+            var props = {
+              config: {
+                method: "runFlow",
+                apiRoot: flowURL,
+                accessToken: responseData.access_token,
+                companyId: companyId,
+                policyId: policyId
+              },
+              useModal: false,
+              successCallback,
+              errorCallback,
+              onCloseModal,
+            };
+            //console.log(props);
+            davinci.skRenderScreen(document.getElementById("widget"), props);
+          })
+          .catch((error) => console.log("error", error));
+
+        function successCallback(response) {
+           const accessToken = response.access_token;
+        const sessionToken = response.sessionToken;
+        const sessionTokenMaxAge = response.sessionTokenMaxAge;
+        //document.getElementById("tokens").innerHTML = `<h3>Access Token</h3><br>${accessToken}<br><h3>Session Token</h3><br>${sessionToken}`;
+          //window.location = "index.html";
+        }
+
+        function errorCallback(error) {
+          console.log(error);
+          //window.location = "index.html";
+        }
+
+        function onCloseModal() {
+          console.log("onCloseModal");
+        }
+      }
+    </script>
+  </head>
+  <body onload="loadwidget()">
+    <!--************************-->
+    <!--  ADD LINK TO CSS HERE  -->
+    <link rel="stylesheet" href="." />
+    <!--************************-->
+    <div class="background">
+      <div class="shape"></div>
+      <div class="shape"></div>
+    </div>
+    <!--  DISPLAY WIDGET  -->
+    <div id="widget" class="skWidget widget"></div>
+  </body>
+</html>
